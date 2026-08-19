@@ -3,4 +3,4 @@ project(raykg C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_executable(raykg main.c ADB_query.c ADB_query.h SIGN.c SIGN.h FW.c FW.h)
+add_executable(raykg main.c adb_query.c adb_query.h sign.c sign.h fw.c fw.h)

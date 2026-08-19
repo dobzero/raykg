@@ -1,5 +1,5 @@
-#include "SIGN.h"
-#include "FW.h"
+#include "sign.h"
+#include "fw.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -22,7 +22,7 @@ static const char * apksigner_path() {
     return *path?path:nullptr;
 }
 
-void SIGN_resign_all(const char *apks, const char * keystore, const char * alias, const char *pass_ks, const char * pass_key) {
+void sign_resign_all(const char *apks, const char * keystore, const char * alias, const char *pass_ks, const char * pass_key) {
     char * files_dup=strdup(apks);
 
     char *back=nullptr;
@@ -41,7 +41,7 @@ void SIGN_resign_all(const char *apks, const char * keystore, const char * alias
             return;
         fclose(fp_signer);
 
-        if (!FW_check_filename(file)) {
+        if (!fw_check_filename(file)) {
             return;
         }
         sprintf(sign, "%s verify --print-certs %s", signer_path, file);

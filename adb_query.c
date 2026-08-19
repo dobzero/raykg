@@ -1,5 +1,5 @@
-#include "ADB_query.h"
-#include "FW.h"
+#include "adb_query.h"
+#include "fw.h"
 
 #include <ctype.h>
 #include <stdio.h>
@@ -10,7 +10,7 @@
 
 
 // ReSharper disable once CppUseInternalLinkage
-void STR_append(char **result, const char *a) {
+void str_append(char **result, const char *a) {
     if (*result) {
         char * r=nullptr;
         asprintf(&r, "%s%s", *result, a);
@@ -20,20 +20,20 @@ void STR_append(char **result, const char *a) {
     }
 }
 
-char * ADB_get_packages_list() {
+char * adb_get_packages_list() {
     FILE * adb=popen("adb shell pm list packages", "r");
 
     char apk[512];
     char *result=nullptr;
     while (fgets(apk, 512, adb)) {
-        STR_append(&result, apk);
+        str_append(&result, apk);
     }
 
     pclose(adb);
     return result;
 }
 
-char * ADB_get_apk_path(const char *query, const char *apk) {
+char * adb_get_apk_path(const char *query, const char *apk) {
     const char * apk_name = strstr(query, apk);
     if (!apk_name)
         return nullptr;
@@ -46,7 +46,7 @@ char * ADB_get_apk_path(const char *query, const char *apk) {
     return strdup(target);
 }
 
-const char * ADB_get_bundle_package_name(const char *apks) {
+const char * adb_get_bundle_package_name(const char *apks) {
     const char *baseapk=strstr(apks, "/base.apk");
     if (!baseapk)
         return nullptr;
@@ -57,13 +57,13 @@ const char * ADB_get_bundle_package_name(const char *apks) {
     return result;
 }
 
-static const char * ADB_get_extension(const Bundle_Type_e type) {
+static const char * ADB_get_extension(const bundle_type_e type) {
     if (type==BUNDLE_X_APK_FORMAT)
         return ".xapk";
     return nullptr;
 }
 
-void ADB_pull(const char *apks, const char *outdir) {
+void adb_pull(const char *apks, const char *outdir) {
     char cmdls[10000];
     char *editable=strdup(apks);
     char *bk=nullptr;
@@ -74,7 +74,7 @@ void ADB_pull(const char *apks, const char *outdir) {
 
         if (strncmp(tok, "package:", strlen("package:"))==0)
             tok=strchr(tok, ':')+1;
-        if (!FW_check_filename(strrchr(tok, '/'))) {
+        if (!fw_check_filename(strrchr(tok, '/'))) {
             return;
         }
         sprintf(cmdls, "adb pull %s %s/%s", tok, outdir, strrchr(tok, '/')+1);
@@ -87,7 +87,7 @@ void ADB_pull(const char *apks, const char *outdir) {
     free(editable);
 }
 
-void ADB_compile_bundle(const char * apk_name, const char *outdir, const Bundle_Type_e type) {
+void adb_compile_bundle(const char * apk_name, const char *outdir, const bundle_type_e type) {
 
     const char * extension=ADB_get_extension(type);
     char cmdls[1000];

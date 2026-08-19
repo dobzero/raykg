@@ -1,9 +1,9 @@
-#include "FW.h"
+#include "fw.h"
 
 #include <string.h>
 
 // https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/libs/androidfw/ApkParsing.cpp
-bool FW_check_filename(const char *file_a) {
+bool fw_check_filename(const char *file_a) {
     for (;;file_a++) {
         switch (*file_a) {
             case '\0':
