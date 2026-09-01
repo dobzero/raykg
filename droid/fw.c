@@ -3,7 +3,7 @@
 #include <string.h>
 
 // https://android.googlesource.com/platform/frameworks/base/+/refs/heads/main/libs/androidfw/ApkParsing.cpp
-bool fw_check_filename(const char *file_a) {
+bool droid_fw_check_filename(const char *file_a) {
     for (;;file_a++) {
         switch (*file_a) {
             case '\0':

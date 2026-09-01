@@ -3,4 +3,4 @@ project(raysc C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_library(raysc STATIC library.c)
+add_library(raysc STATIC script.c script.h)

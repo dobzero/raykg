@@ -22,7 +22,7 @@ static const char * apksigner_path() {
     return *path?path:nullptr;
 }
 
-void sign_resign_all(const char *apks, const char * keystore, const char * alias, const char *pass_ks, const char * pass_key) {
+void droid_sign_resign_all(const char *apks, const char * keystore, const char * alias, const char *pass_ks, const char * pass_key) {
     char * files_dup=strdup(apks);
 
     char *back=nullptr;
@@ -41,7 +41,7 @@ void sign_resign_all(const char *apks, const char * keystore, const char * alias
             return;
         fclose(fp_signer);
 
-        if (!fw_check_filename(file)) {
+        if (!droid_fw_check_filename(file)) {
             return;
         }
         sprintf(sign, "%s verify --print-certs %s", signer_path, file);

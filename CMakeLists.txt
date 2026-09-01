@@ -3,4 +3,16 @@ project(raykg C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_executable(raykg main.c adb_query.c adb_query.h sign.c sign.h fw.c fw.h)
+add_library(droid STATIC droid/adb_query.c droid/adb_query.h droid/sign.c droid/sign.h droid/fw.c droid/fw.h)
+add_library(unix_elf STATIC unix/elf/elf_file.c unix/elf/elf_file.h unix/elf/strtab.c unix/elf/strtab.h)
+
+add_executable(raykg main.c droid_cmd.c core/fs_dir.c core/fs_dir.h core/types.h )
+
+add_subdirectory(raysc)
+
+enable_testing()
+add_executable(bin_test test/bin_test.c)
+target_link_libraries(bin_test unix_elf)
+add_test(bin_test "open bin files for testing prp")
+
+target_link_libraries(raykg droid raysc unix_elf)

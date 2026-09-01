@@ -20,7 +20,7 @@ void str_append(char **result, const char *a) {
     }
 }
 
-char * adb_get_packages_list() {
+char * droid_adb_get_packages_list() {
     FILE * adb=popen("adb shell pm list packages", "r");
 
     char apk[512];
@@ -33,7 +33,7 @@ char * adb_get_packages_list() {
     return result;
 }
 
-char * adb_get_apk_path(const char *query, const char *apk) {
+char * droid_adb_get_apk_path(const char *query, const char *apk) {
     const char * apk_name = strstr(query, apk);
     if (!apk_name)
         return nullptr;
@@ -46,7 +46,7 @@ char * adb_get_apk_path(const char *query, const char *apk) {
     return strdup(target);
 }
 
-const char * adb_get_bundle_package_name(const char *apks) {
+const char * droid_adb_get_bundle_package_name(const char *apks) {
     const char *baseapk=strstr(apks, "/base.apk");
     if (!baseapk)
         return nullptr;
@@ -63,7 +63,7 @@ static const char * ADB_get_extension(const bundle_type_e type) {
     return nullptr;
 }
 
-void adb_pull(const char *apks, const char *outdir) {
+void droid_adb_pull(const char *apks, const char *outdir) {
     char cmdls[10000];
     char *editable=strdup(apks);
     char *bk=nullptr;
@@ -74,7 +74,7 @@ void adb_pull(const char *apks, const char *outdir) {
 
         if (strncmp(tok, "package:", strlen("package:"))==0)
             tok=strchr(tok, ':')+1;
-        if (!fw_check_filename(strrchr(tok, '/'))) {
+        if (!droid_fw_check_filename(strrchr(tok, '/'))) {
             return;
         }
         sprintf(cmdls, "adb pull %s %s/%s", tok, outdir, strrchr(tok, '/')+1);
@@ -87,7 +87,7 @@ void adb_pull(const char *apks, const char *outdir) {
     free(editable);
 }
 
-void adb_compile_bundle(const char * apk_name, const char *outdir, const bundle_type_e type) {
+void droid_adb_compile_bundle(const char * apk_name, const char *outdir, const bundle_type_e type) {
 
     const char * extension=ADB_get_extension(type);
     char cmdls[1000];
