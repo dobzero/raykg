@@ -1,5 +1,6 @@
 
 #include "core/types.h"
+#include "cmdlist.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -62,14 +63,15 @@ void ray_file_load(ray_file_t *apkinfo) {
 }
 
 
-extern void droid_get_apk(const char *out_dir);
 int main() {
     const char * get_apk=pa_string("get_apk");
     const char * out_dir=pa_string("out_dir");
     pa_set_default(out_dir, "com.rockstargames.gtasa");
 
+    const auto droid_do = droid_create(out_dir);
     if (get_apk)
-        droid_get_apk(out_dir);
+        droid_get_apk(droid_do);
+    droid_destroy(droid_do);
 
     return *get_apk!='\0';
 }

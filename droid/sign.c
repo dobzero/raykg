@@ -1,11 +1,9 @@
-#include "sign.h"
-#include "fw.h"
+#include "droid_file.h"
 
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <glob.h>
-
 
 static const char * apksigner_path() {
     static char path[1000]={};

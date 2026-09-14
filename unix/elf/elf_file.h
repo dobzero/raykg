@@ -9,7 +9,6 @@ typedef struct elf_needed {
 } elf_needed_t;
 
 elf_needed_t * elf_needed_new();
-//void elf_needed_emplace(elf_needed_t *needed, FILE *fp, size_t offset, size_t size);
 void elf_needed_print_deps(const elf_needed_t *deps);
 void elf_needed_delete(elf_needed_t*);
 

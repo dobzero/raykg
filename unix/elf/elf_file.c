@@ -5,7 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 
-void * exchange(void **v, void *e) {
+static void * exchange(void **v, void *e) {
     void *r = *v;
     *v = e;
     return r;
@@ -36,7 +36,7 @@ void elf_needed_delete(elf_needed_t *needed) {
     free(needed);
 }
 
-void elf_needed_emplace(elf_needed_t * deps, const elf_strtab_t * elf_strtab, const Elf64_Dyn * dyn) {
+static void elf_needed_emplace(elf_needed_t * deps, const elf_strtab_t * elf_strtab, const Elf64_Dyn * dyn) {
     table_str_t * table=nullptr;
     for (size_t i=0; i<elf_strtab->tables_count && !table; i++) {
         if (dyn->d_tag==DT_NEEDED)
@@ -89,9 +89,9 @@ unix_elf_bin_t * unix_elf_open(const char * path) {
 
         fseek(ueb->fp, (long)sections[3], SEEK_SET);
         Elf64_Phdr * plist = calloc(sizeof(Elf64_Phdr), sections[4]);
-        const size_t pcount = fread(plist, sizeof(Elf64_Phdr), sections[4], ueb->fp);
+        const size_t plist_count = fread(plist, sizeof(Elf64_Phdr), sections[4], ueb->fp);
 
-        for (size_t i=0; i<pcount; i++) {
+        for (size_t i=0; i<plist_count; i++) {
             if (plist[i].p_type!=PT_DYNAMIC) {
                 continue;
             }

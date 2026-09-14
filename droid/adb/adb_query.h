@@ -2,7 +2,7 @@
 
 char * droid_adb_get_packages_list();
 char * droid_adb_get_apk_path(const char * query, const char *apk);
-const char * droid_adb_get_bundle_package_name(const char *apks);
+char * droid_adb_get_bundle_package_name(const char *apks);
 
 void droid_adb_pull(const char *apks, const char *outdir);
 typedef enum bundle_type {

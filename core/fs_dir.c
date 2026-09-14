@@ -9,7 +9,7 @@ static int discard(const struct dirent *del) {
     return *del->d_name!='.';
 }
 
-const char * fs_list_files(const char * dir) {
+char * fs_list_files(const char * dir) {
     char * result=nullptr;
 
     struct dirent ** ent_list=nullptr;

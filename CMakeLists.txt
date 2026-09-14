@@ -3,10 +3,10 @@ project(raykg C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_library(droid STATIC droid/adb_query.c droid/adb_query.h droid/sign.c droid/sign.h droid/fw.c droid/fw.h)
+add_library(droid STATIC droid/adb/adb_query.c droid/adb/adb_query.h droid/sign.c droid/fw.c droid/droid_file.h)
 add_library(unix_elf STATIC unix/elf/elf_file.c unix/elf/elf_file.h unix/elf/strtab.c unix/elf/strtab.h)
 
-add_executable(raykg main.c droid_cmd.c core/fs_dir.c core/fs_dir.h core/types.h )
+add_executable(raykg main.c droid/droid.c core/fs_dir.c core/fs_dir.h core/types.h cmdlist.h)
 
 add_subdirectory(raysc)
 
