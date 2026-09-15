@@ -11,6 +11,8 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#include <zip.h>
+
 static void pull_apks(droid_file_t *drf, const char * apk_path, char * package_name) {
     droid_adb_pull(apk_path, drf->output_dir);
     drf->output_dir_files = fs_list_files(drf->output_dir);
@@ -38,10 +40,15 @@ droid_file_t * droid_create(ray_any_t * ray, const char * in_apk, const char *ou
         drf->output_dir_files = fs_list_files(out_dir);
     }
     if (strlen(in_apk)) {
-        FILE *fp = fopen(in_apk, "r");
-        if (!fp)
+        int err=0;
+        zip_error_t e;
+        zip_t * pkg_file = zip_open(in_apk, ZIP_RDONLY, &err);
+        zip_error_init_with_code(&e, err);
+        if (!pkg_file&&err) {
+            fprintf(stderr, "this isn't a apk file: %s\n", zip_error_strerror(&e));
             goto NoContext;
-        fclose(fp);
+        }
+        zip_close(pkg_file);
         drf->input_file = strdup(in_apk);
     }
     drf->context = ray;
@@ -114,8 +121,16 @@ void droid_display_useful_strings(const droid_file_t *drf) {
                 continue;
             char * target = buffer + buf-i;
             assert(isprint(*target));
-            if (strstr(target, "http"))
-                printf("%#lx: %.*s\n", ftell(fp), i, buffer + buf-i-1);
+
+            const char * pattern_and_highlights[] = {
+                "http", ".com", ".io", ".org",
+
+
+                "android", "github"
+            };
+            for (int p=0;p<6;p++)
+                if (strstr(target, pattern_and_highlights[p]))
+                    printf("%#lx: %.*s\n", ftell(fp), i, buffer + buf-i-1);
         } while (buf < rfp);
     }
 
