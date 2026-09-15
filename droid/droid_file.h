@@ -16,3 +16,4 @@ char * droid_get_package_name(const droid_file_t * drf);
 bool droid_fw_check_filename(const char *file_a);
 void droid_sign_resign_all(const char *apks, const char * keystore, const char * alias, const char *pass_ks, const char * pass_key);
 
+bool droid_test_apk_integrity(const char * filename);

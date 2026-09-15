@@ -10,7 +10,6 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <stdio.h>
-
 #include <zip.h>
 
 static void pull_apks(droid_file_t *drf, const char * apk_path, char * package_name) {
@@ -40,19 +39,11 @@ droid_file_t * droid_create(ray_any_t * ray, const char * in_apk, const char *ou
         drf->output_dir_files = fs_list_files(out_dir);
     }
     if (strlen(in_apk)) {
-        int err=0;
-        zip_error_t e;
-        zip_t * pkg_file = zip_open(in_apk, ZIP_RDONLY, &err);
-        zip_error_init_with_code(&e, err);
-        if (!pkg_file&&err) {
-            fprintf(stderr, "this isn't a apk file: %s\n", zip_error_strerror(&e));
-            goto NoContext;
-        }
-        zip_close(pkg_file);
-        drf->input_file = strdup(in_apk);
+        if (droid_test_apk_integrity(in_apk))
+            drf->input_file = strdup(in_apk);
     }
-    drf->context = ray;
-    NoContext:
+    if (drf->input_file)
+        drf->context = ray;
     return drf;
 }
 
@@ -108,9 +99,9 @@ void droid_display_useful_strings(const droid_file_t *drf) {
     if (!fp)
         return;
 
-    char buffer[1024 + 1] = {};
+    char buffer[4096 + 1] = {};
     for (size_t rfp=0, buf=0;
-        (rfp = fread(buffer, 1, 1024, fp)); buf=0) {
+        (rfp = fread(buffer, 1, 4096, fp)); buf=0) {
 
         do {
             int i =0;
@@ -123,14 +114,15 @@ void droid_display_useful_strings(const droid_file_t *drf) {
             assert(isprint(*target));
 
             const char * pattern_and_highlights[] = {
-                "http", ".com", ".io", ".org",
+                "http", ".com", ".io", ".org", ".so", // shared objects
 
 
-                "android", "github"
+                "android", "github" // domains
             };
-            for (int p=0;p<6;p++)
+            for (int p=0;p<sizeof(pattern_and_highlights)/sizeof(void*);p++)
                 if (strstr(target, pattern_and_highlights[p]))
-                    printf("%#lx: %.*s\n", ftell(fp), i, buffer + buf-i-1);
+                    if (printf("%#lx: %.*s\n", ftell(fp), i, buffer + buf-i-1))
+                        break;
         } while (buf < rfp);
     }
 
