@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <regex.h>
 #include <zip.h>
 
 static void pull_apks(droid_file_t *drf, const char * apk_path, char * package_name) {
@@ -38,8 +39,17 @@ droid_file_t * droid_create(ray_any_t * ray, const char * in_apk, const char *ou
         drf->output_dir = strdup(out_dir);
         drf->output_dir_files = fs_list_files(out_dir);
     }
+    int err=0;
     if (strlen(in_apk)) {
-        if (droid_test_apk_integrity(in_apk))
+        drf->pkg_file=zip_open(in_apk, ZIP_RDONLY, &err);
+        zip_error_t e; zip_error_init(&e);
+        if (!drf->pkg_file&&err) {
+            fprintf(stderr, "cannot open this apk: %s\n", zip_error_strerror(&e));
+            zip_error_fini(&e);
+            return nullptr;
+        }
+
+        if (droid_test_apk_is_apk(drf))
             drf->input_file = strdup(in_apk);
     }
     if (drf->input_file)
@@ -52,16 +62,50 @@ void droid_destroy(droid_file_t * drf) {
         free(drf->output_dir_files);
     if (drf->output_dir)
         free(drf->output_dir);
-    free(drf->input_file);
+
+    if (drf->input_file) {
+        free(drf->input_file);
+        zip_close(drf->pkg_file);
+    }
 
     free(drf);
 }
 
 char * droid_get_package_name(const droid_file_t *drf) {
-    if (*drf->context->ray_data.package_name)
-        return drf->context->ray_data.package_name;
+    if (!drf->input_file)
+        return drf->output_dir;
 
-    return drf->output_dir; // todo: search for android:package in Manifest later, but for now
+    if (strlen(drf->context->ray_data.package_name)==0) {
+
+        zip_file_t * manifest = zip_fopen(drf->pkg_file, "AndroidManifest.xml", 0);
+        regex_t pattern;
+        regcomp(&pattern, "^[a-z_][a-z0-9_]*(\\.[a-z_][a-z0-9_]*)*$", 0);
+
+        char buffer[1000], pkgname[100]={};
+
+        size_t zr=0;
+        do {
+            zr=zip_fread(manifest, buffer, 1000);
+
+            regmatch_t list[100]={};
+            const bool regex_ok=regexec(&pattern, buffer, 100, list, 0)==0;
+            for (size_t i=0;regex_ok&&i<100;i++) {
+                if (list[i].rm_so==list[i].rm_eo)
+                    break;
+                if (strlen(pkgname))
+                    if (strcasestr(buffer+ list[i].rm_so, drf->input_file)==nullptr)
+                        continue;
+                strncpy(pkgname, buffer+ list[i].rm_so, list[i].rm_eo - list[i].rm_so);
+            }
+
+        } while (zr>0);
+        strcpy(drf->context->ray_data.package_name, pkgname);
+        regfree(&pattern);
+
+        zip_fclose(manifest);
+    }
+
+    return drf->context->ray_data.package_name;
 }
 
 void droid_get_apk(droid_file_t * drf) {
