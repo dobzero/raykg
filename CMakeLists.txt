@@ -3,23 +3,15 @@ project(raykg C)
 
 set(CMAKE_C_STANDARD 23)
 
-add_library(droid STATIC
-        droid/adb/adb_query.c droid/adb/adb_query.h
-        droid/sign.c
-        droid/fw.c
-        droid/droid_file.h
-        droid/integrity.c
-        droid/pkg_dir.c)
-add_library(unix_elf STATIC unix/elf/elf_file.c unix/elf/elf_file.h unix/elf/strtab.c unix/elf/strtab.h)
+file(GLOB CORE_SRC src/core/*.c src/auto/*.c src/core/*.h src/auto/*.h)
+file(GLOB DROID_SRC src/droid/*.c src/droid/adb/*.c drc/droid/*.h src/droid/adb/*.h)
+file(GLOB UNIX_SRC src/unix/elf/*.c drc/unix/elf/*.h)
 
-add_executable(raykg
-        main.c
-        droid/droid.c
-        core/fs_dir.c core/fs_dir.h
-        core/types.h
-        cmdlist.h
-        auto/script.c auto/script.h
-    )
+add_library(droid STATIC ${DROID_SRC})
+add_library(unix_elf STATIC ${UNIX_SRC})
+include_directories("src")
+
+add_executable(raykg src/main.c src/cmdlist.h ${CORE_SRC})
 
 set(BUILD_REGRESS OFF CACHE BOOL "Build regression tests" FORCE)
 set(BUILD_EXAMPLES OFF CACHE BOOL "Build examples" FORCE)

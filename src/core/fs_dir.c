@@ -1,8 +1,10 @@
 #include "fs_dir.h"
 
+#include <sys/stat.h>
 #include <dirent.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 
 void str_append(char **result, const char *a);
 static int discard(const struct dirent *del) {
@@ -28,4 +30,24 @@ char * fs_list_files(const char * dir) {
         free(ent_list);
 
     return result;
+}
+
+char * strpath_r(char *src, char **bkp) {
+    return strtok_r(src, "/", bkp);
+}
+
+void create_dirs(const char * path, const bool isdir) {
+    char fullpath[4000], walkdir[4000]={0};
+    strcpy(fullpath, path);
+    if (!isdir)
+        *strrchr(fullpath, '/')='\0';
+    char *bkp=nullptr;
+    for (const char *parent = strpath_r(fullpath, &bkp);
+        parent; parent=strpath_r(nullptr, &bkp)) {
+        char * dir=walkdir+strlen(walkdir);
+        strcpy(dir, parent);
+        mkdir(walkdir, 0777);
+        dir[strlen(parent)]='/';
+        }
+
 }

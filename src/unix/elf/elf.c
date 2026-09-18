@@ -1,4 +1,4 @@
-#include "elf_file.h"
+#include "elf.h"
 
 #include <stdlib.h>
 #include <elf.h>

@@ -1,5 +1,5 @@
 #include "adb_query.h"
-#include "../droid_file.h"
+#include "droid/droid.h"
 
 #include <ctype.h>
 #include <stdio.h>

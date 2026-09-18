@@ -1,8 +1,8 @@
-#include "droid_file.h"
+#include "droid.h"
 #include <zip.h>
 
-bool droid_test_apk_is_apk(const droid_file_t * drf) {
-    zip_t * pkg_file = drf->pkg_file;
+bool droid_test_apk_is_apk(const droid_bundle_t * bundle) {
+    zip_t * pkg_file = bundle->pkg_file;
 
     const auto files=zip_get_num_entries(pkg_file, ZIP_FL_UNCHANGED);
     printf("count of files in this apk: %lu\n", files);

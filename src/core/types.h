@@ -16,7 +16,7 @@ typedef struct {
 } program_arg_t;
 
 
-typedef struct droid_file droid_file_t;
+typedef struct droid_bundle droid_bundle_t;
 
 typedef enum  {
     RAY_BUILD_FOR_APK
@@ -27,7 +27,7 @@ typedef struct ray_any_ {
 
     struct {
         union {
-            droid_file_t * droid_pkg_file;
+            droid_bundle_t * droid_pkg_file;
         };
 
         union {
