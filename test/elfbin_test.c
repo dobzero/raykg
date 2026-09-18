@@ -1,5 +1,5 @@
 
-#include "../unix/elf/elf_file.h"
+#include "unix/elf/elf.h"
 
 static void open_bin(const char *path) {
     fprintf(stdout, "open binary: %s\n", path);

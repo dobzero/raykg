@@ -19,8 +19,8 @@ set(BUILD_DOC OFF CACHE BOOL "Build documentation" FORCE)
 add_subdirectory(libzip)
 
 enable_testing()
-add_executable(bin_test test/bin_test.c)
-target_link_libraries(bin_test unix_elf)
-add_test(bin_test "open bin files for testing prp")
+add_executable(elfbin_test test/elfbin_test.c)
+target_link_libraries(elfbin_test unix_elf)
+add_test(elfbin_test "open bin files for testing prp")
 
 target_link_libraries(raykg droid unix_elf libzip::zip)
