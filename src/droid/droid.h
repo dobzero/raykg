@@ -1,6 +1,8 @@
 #pragma once
-#include "../core/types.h"
+#include "core/types.h"
+#include "manifest.h"
 #include <zip.h>
+
 
 typedef struct droid_bundle {
     char *output_dir_files;
@@ -9,6 +11,8 @@ typedef struct droid_bundle {
     zip_t * pkg_file;
 
     ray_any_t * context;
+
+    manifest_t * manifest;
 
     bool proceed;
 } droid_bundle_t;
@@ -21,3 +25,4 @@ void droid_sign_resign_all(const char *apks, const char * keystore, const char *
 
 bool droid_test_apk_is_apk(const droid_bundle_t * bundle);
 void droid_extract(const droid_bundle_t * bundle);
+void droid_list_intents(const droid_bundle_t *bundle, FILE *fp);

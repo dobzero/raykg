@@ -26,8 +26,9 @@ char * fs_list_files(const char * dir) {
 
     }
 
-    if (ent_list)
-        free(ent_list);
+    for (size_t e=0;ent_list&&e<entries;e++)
+        free(ent_list[e]);
+    free(ent_list);
 
     return result;
 }

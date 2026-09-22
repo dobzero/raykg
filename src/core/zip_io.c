@@ -3,11 +3,12 @@
 #include <regex.h>
 #include <string.h>
 
-void zip_get_pattern_from_file(zip_file_t * file, char output[1000], const char * regex) {
+void zip_get_pattern_from_file(zip_t *z, const char *filename, char output[1000], const char * regex) {
     regex_t pattern;
     regcomp(&pattern, regex, 0);
-    size_t zr=0;
+    zip_int64_t zr=0;
     char buffer[1000];
+    zip_file_t * file = zip_fopen(z, filename, 0);
     do {
         zr=zip_fread(file, buffer, 1000);
 
@@ -21,6 +22,8 @@ void zip_get_pattern_from_file(zip_file_t * file, char output[1000], const char 
         }
 
     } while (zr>0);
+    zip_fclose(file);
+
     regfree(&pattern);
 }
 

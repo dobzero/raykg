@@ -31,6 +31,16 @@ static void recompile_apks(const droid_bundle_t *bundle, const char * package_na
     droid_adb_compile_bundle(package_name, bundle->output_dir, BUNDLE_X_APK_FORMAT);
 }
 
+static void droid_load_files(droid_bundle_t *bundle) {
+    bundle->manifest = manifest_from_archive(bundle->pkg_file);
+    manifest_prepare(bundle->manifest);
+}
+static void droid_unload_files(droid_bundle_t *bundle) {
+    if (bundle->manifest)
+        manifest_destroy(bundle->manifest);
+    bundle->manifest=nullptr;
+}
+
 droid_bundle_t * droid_create(ray_any_t * ray, const char * in_apk, const char *out_dir) {
     droid_bundle_t * bundle = calloc(1, sizeof(droid_bundle_t));
 
@@ -50,6 +60,7 @@ droid_bundle_t * droid_create(ray_any_t * ray, const char * in_apk, const char *
 
         if (droid_test_apk_is_apk(bundle))
             bundle->input_file = strdup(in_apk);
+        droid_load_files(bundle);
     }
     if (bundle->input_file)
         bundle->context = ray;
@@ -57,6 +68,8 @@ droid_bundle_t * droid_create(ray_any_t * ray, const char * in_apk, const char *
 }
 
 void droid_destroy(droid_bundle_t * bundle) {
+    droid_unload_files(bundle);
+
     if (bundle->output_dir_files)
         free(bundle->output_dir_files);
     if (bundle->output_dir)
@@ -75,13 +88,9 @@ char * droid_get_package_name(const droid_bundle_t *bundle) {
         return bundle->output_dir;
 
     if (strlen(bundle->context->ray_data.package_name)==0) {
-
-        zip_file_t * manifest = zip_fopen(bundle->pkg_file, "AndroidManifest.xml", 0);
-
-        char package_name[1000]={};
-        zip_get_pattern_from_file(manifest, package_name, "^[a-z_][a-z0-9_]*(\\.[a-z_][a-z0-9_]*)*$");
+        char * package_name = manifest_get(bundle->manifest, "package");
         strcpy(bundle->context->ray_data.package_name, package_name);
-        zip_fclose(manifest);
+        free(package_name);
     }
 
     return bundle->context->ray_data.package_name;
@@ -91,7 +100,7 @@ void droid_get_apk(droid_bundle_t * bundle) {
     char * apk_list= droid_adb_get_packages_list();
     char * apk_path=apk_list?droid_adb_get_apk_path(apk_list, "gtasa"):nullptr;
 
-    char * package_name = bundle->context->ray_data.package_name;
+    char * package_name = droid_get_package_name(bundle);
     do {
         if (apk_path && !bundle->output_dir_files) {
             pull_apks(bundle, apk_path, package_name);
