@@ -55,12 +55,11 @@ droid_bundle_t * droid_create(ray_any_t * ray, const char * in_apk, const char *
         if (!bundle->pkg_file&&err) {
             fprintf(stderr, "cannot open this apk: %s\n", zip_error_strerror(&e));
             zip_error_fini(&e);
-            return nullptr;
+        } else {
+            if (droid_test_apk_is_apk(bundle))
+                bundle->input_file = strdup(in_apk);
+            droid_load_files(bundle);
         }
-
-        if (droid_test_apk_is_apk(bundle))
-            bundle->input_file = strdup(in_apk);
-        droid_load_files(bundle);
     }
     if (bundle->input_file)
         bundle->context = ray;

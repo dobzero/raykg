@@ -140,8 +140,8 @@ int main() {
     pa_bool("useful_strings");
     const bool * extract=pa_bool("extract");
 
-    pa_set_default(apk_file, "app-genshinSpoof-relWithDebInfo.apk");
-    pa_set_default(output, "app-genshinSpoof");
+    pa_set_default(apk_file, "F-Droid.apk");
+    pa_set_default(output, "F-Droid");
     pa_set_default(list_intents, "true");
     pa_set_default(extract, "true");
 

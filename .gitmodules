@@ -1,3 +1,6 @@
 [submodule "libzip"]
 	path = libzip
 	url = https://github.com/nih-at/libzip.git
+[submodule "libslop"]
+	path = libslop
+	url = https://github.com/dobzero/libslop.git
