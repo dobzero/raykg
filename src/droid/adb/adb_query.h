@@ -10,3 +10,4 @@ typedef enum bundle_type {
 } bundle_type_e;
 
 void droid_adb_compile_bundle(const char * apk_name, const char *outdir, bundle_type_e type);
+void str_append(char **result, const char *a);

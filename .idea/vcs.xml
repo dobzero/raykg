@@ -2,6 +2,7 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libslop" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/libzip" vcs="Git" />
   </component>
 </project>

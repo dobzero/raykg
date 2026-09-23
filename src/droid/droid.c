@@ -12,13 +12,28 @@
 #include <ctype.h>
 #include <stdio.h>
 
-static void pull_apks(droid_bundle_t *bundle, const char * apk_path, char * package_name) {
-    droid_adb_pull(apk_path, bundle->output_dir);
-    bundle->output_dir_files = fs_list_files(bundle->output_dir);
+static void droid_set_apk_name(droid_bundle_t * bundle, const char * apk_name) {
+    strcpy(bundle->context->ray_data.package_name, apk_name);
+    if (strcmp(bundle->output_dir, "output-apk-list")==0) {
+        free(bundle->output_dir);
+        bundle->output_dir= strdup(bundle->context->ray_data.package_name);
+    }
+}
+
+static void pull_apks(droid_bundle_t *bundle, const char * apk_path) {
     char * apk_name=droid_adb_get_bundle_package_name(apk_path);
 
-    strcpy(package_name, apk_name);
+
+    droid_set_apk_name(bundle, apk_name);
+
     free(apk_name);
+    if (access(bundle->output_dir, F_OK)==0) {
+        bundle->output_dir_files = fs_list_files(bundle->output_dir);
+        return;
+    }
+    droid_adb_pull(apk_path, bundle->output_dir);
+    bundle->output_dir_files = fs_list_files(bundle->output_dir);
+
     ray_file_save(bundle->context);
 }
 
@@ -44,10 +59,13 @@ static void droid_unload_files(droid_bundle_t *bundle) {
 droid_bundle_t * droid_create(ray_any_t * ray, const char * in_apk, const char *out_dir) {
     droid_bundle_t * bundle = calloc(1, sizeof(droid_bundle_t));
 
-    if (strlen(out_dir)) {
+    if (strlen(out_dir)==0) {
+        bundle->output_dir = strdup("output-apk-list");
+    } else {
         bundle->output_dir = strdup(out_dir);
-        bundle->output_dir_files = fs_list_files(out_dir);
     }
+    bundle->output_dir_files = fs_list_files(out_dir);
+
     int err=0;
     if (strlen(in_apk)) {
         bundle->pkg_file=zip_open(in_apk, ZIP_RDONLY, &err);
@@ -61,7 +79,7 @@ droid_bundle_t * droid_create(ray_any_t * ray, const char * in_apk, const char *
             droid_load_files(bundle);
         }
     }
-    if (bundle->input_file)
+    if (bundle->input_file||bundle->output_dir)
         bundle->context = ray;
     return bundle;
 }
@@ -83,39 +101,39 @@ void droid_destroy(droid_bundle_t * bundle) {
 }
 
 char * droid_get_package_name(const droid_bundle_t *bundle) {
-    if (!bundle->input_file)
-        return bundle->output_dir;
-
     if (strlen(bundle->context->ray_data.package_name)==0) {
-        char * package_name = manifest_get(bundle->manifest, "package");
-        strcpy(bundle->context->ray_data.package_name, package_name);
-        free(package_name);
+        if (bundle->manifest) {
+            char * package_name = manifest_get(bundle->manifest, "package");
+            strcpy(bundle->context->ray_data.package_name, package_name);
+            free(package_name);
+        } else if (!bundle->input_file) {
+                return bundle->output_dir;
+        }
     }
 
     return bundle->context->ray_data.package_name;
 }
 
-void droid_get_apk(droid_bundle_t * bundle) {
+void droid_get_apk(droid_bundle_t * bundle, const char * pkg_ref_name) {
     char * apk_list= droid_adb_get_packages_list();
-    char * apk_path=apk_list?droid_adb_get_apk_path(apk_list, "gtasa"):nullptr;
+    char * apk_path=apk_list?droid_adb_get_apk_path(apk_list, pkg_ref_name):nullptr;
 
-    char * package_name = droid_get_package_name(bundle);
     do {
         if (apk_path && !bundle->output_dir_files) {
-            pull_apks(bundle, apk_path, package_name);
+            pull_apks(bundle, apk_path);
             free(apk_path);
+            bundle->proceed=true;
         } else {
-            strcpy(package_name, bundle->output_dir);
-            if (access(package_name, F_OK))
-                if (!((bundle->proceed=false)))
-                    break;
             ray_file_load(bundle->context);
+            if (access(droid_get_package_name(bundle), F_OK))
+                break;
+            bundle->proceed=true;
         }
     } while (false);
     if (bundle->proceed) {
-        droid_fw_check_filename(package_name);
+        droid_fw_check_filename(droid_get_package_name(bundle));
 
-        recompile_apks(bundle, package_name);
+        recompile_apks(bundle, droid_get_package_name(bundle));
         ray_file_save(bundle->context);
     }
 
@@ -146,8 +164,6 @@ void droid_display_useful_strings(const droid_bundle_t *bundle) {
 
             const char * pattern_and_highlights[] = {
                 "http", ".com", ".io", ".org", ".so", // shared objects
-
-
                 "android", "github" // domains
             };
             for (int p=0;p<sizeof(pattern_and_highlights)/sizeof(void*);p++)

@@ -1,6 +1,6 @@
 #pragma once
 #include "core/types.h"
-#include "manifest.h"
+#include "meta_inf/manifest.h"
 #include <zip.h>
 
 

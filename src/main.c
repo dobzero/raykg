@@ -119,7 +119,7 @@ static void ray_run(const ray_any_t * ray) {
         printf("pkg package name: %s\n", droid_get_package_name(ray->droid_pkg_file));
 
         if (*(const char*)pa_get("get_apk")) {
-            droid_get_apk(ray->droid_pkg_file);
+            droid_get_apk(ray->droid_pkg_file, pa_get("get_apk"));
             return;
         }
         if (*(const bool*)pa_get("useful_strings"))
@@ -133,17 +133,14 @@ static void ray_run(const ray_any_t * ray) {
 
 int main() {
     const char * get_apk=pa_string("get_apk");
-    const char * output = pa_string("out_dir");
-    const char * apk_file = pa_string("apk_file");
-    const bool * list_intents=pa_bool("list_intents");
+    pa_string("out_dir");
+    pa_string("apk_file");
+    pa_bool("list_intents");
 
     pa_bool("useful_strings");
-    const bool * extract=pa_bool("extract");
+    pa_bool("extract");
 
-    pa_set_default(apk_file, "F-Droid.apk");
-    pa_set_default(output, "F-Droid");
-    pa_set_default(list_intents, "true");
-    pa_set_default(extract, "true");
+    pa_set_default(get_apk, "subway.surfers");
 
     ray_any_t * ray = ray_build_for(RAY_BUILD_FOR_APK);
     ray_run(ray);

@@ -34,21 +34,21 @@ void droid_sign_resign_all(const char *apks, const char * keystore, const char *
             continue;
         sprintf(sign, "%s sign --ks %s --ks-key-alias %s --ks-pass \"pass:%s\" --key-pass \"pass:%s\" %s", signer_path, keystore, alias, pass_ks, pass_key, file);
 
-        FILE * fp_signer = popen(sign, "r");
-        if (!fp_signer)
+        FILE * signer = popen(sign, "r");
+        if (!signer)
             return;
-        fclose(fp_signer);
+        fclose(signer);
 
         if (!droid_fw_check_filename(file)) {
             return;
         }
         sprintf(sign, "%s verify --print-certs %s", signer_path, file);
         printf("checking filename: %s\n", file);
-        fp_signer=popen(sign, "r");
-        while (fgets(sign, sizeof(sign), fp_signer)) {
+        signer=popen(sign, "r");
+        while (fgets(sign, sizeof(sign), signer)) {
             printf("%s", sign);
         }
-        pclose(fp_signer);
+        pclose(signer);
 
         }
 
