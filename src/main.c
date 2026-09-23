@@ -6,10 +6,10 @@
 #include <string.h>
 #include <stdio.h>
 
-static program_arg_t PA_List[100];
+static program_arg_t pa_list[100];
 
 static char * pa_string(const char * name) {
-    for (program_arg_t *p = PA_List; p; p++) {
+    for (program_arg_t *p = pa_list; p; p++) {
         if (*p->arg!='\0')
             continue;
         p->flag=nullptr;
@@ -21,7 +21,7 @@ static char * pa_string(const char * name) {
 }
 
 static const bool * pa_bool(const char * name) {
-    for (program_arg_t *p = PA_List; p; p++) {
+    for (program_arg_t *p = pa_list; p; p++) {
         if (*p->arg!='\0')
             continue;
         p->flag=nullptr;
@@ -33,7 +33,7 @@ static const bool * pa_bool(const char * name) {
 }
 
 static void pa_set_default(const void *value, const char * arg) {
-    for (program_arg_t *p = PA_List; p; p++) {
+    for (program_arg_t *p = pa_list; p; p++) {
         if ((void*)p->value.str_!=value)
             continue;
         switch (p->type) {
@@ -48,7 +48,7 @@ static void pa_set_default(const void *value, const char * arg) {
     }
 }
 static const void * pa_get(const char *name) {
-    for (const program_arg_t *p = PA_List; p; p++) {
+    for (const program_arg_t *p = pa_list; p; p++) {
         if (strcmp(p->arg, name)!=0)
             continue;
         if (p->type==PROGRAM_ARGTYPE_BOOL)
@@ -134,13 +134,14 @@ static void ray_run(const ray_any_t * ray) {
 int main() {
     const char * get_apk=pa_string("get_apk");
     pa_string("out_dir");
-    pa_string("apk_file");
+    const char *apk_file=pa_string("apk_file");
+    pa_set_default(apk_file, "F-Droid.apk");
     pa_bool("list_intents");
 
     pa_bool("useful_strings");
     pa_bool("extract");
 
-    pa_set_default(get_apk, "subway.surfers");
+    //pa_set_default(get_apk, "subway.surfers");
 
     ray_any_t * ray = ray_build_for(RAY_BUILD_FOR_APK);
     ray_run(ray);

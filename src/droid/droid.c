@@ -2,8 +2,8 @@
 #include "adb/adb_query.h"
 #include "core/zip_io.h"
 #include "core/fs_dir.h"
+#include "tree/files.h"
 #include "cmdlist.h"
-#include "droid.h"
 
 #include <assert.h>
 #include <stdlib.h>
@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <stdio.h>
+#include <fts.h>
 
 static void droid_set_apk_name(droid_bundle_t * bundle, const char * apk_name) {
     strcpy(bundle->context->ray_data.package_name, apk_name);
@@ -44,16 +45,6 @@ static void recompile_apks(const droid_bundle_t *bundle, const char * package_na
         return;
     droid_sign_resign_all(bundle->output_dir_files, "keys-google.keystore", "android-keys", "Scion4-Gloss3-Nicotine6-Liquid2-Sequel2", "Scion4-Gloss3-Nicotine6-Liquid2-Sequel2");
     droid_adb_compile_bundle(package_name, bundle->output_dir, BUNDLE_X_APK_FORMAT);
-}
-
-static void droid_load_files(droid_bundle_t *bundle) {
-    bundle->manifest = manifest_from_archive(bundle->pkg_file);
-    manifest_prepare(bundle->manifest);
-}
-static void droid_unload_files(droid_bundle_t *bundle) {
-    if (bundle->manifest)
-        manifest_destroy(bundle->manifest);
-    bundle->manifest=nullptr;
 }
 
 droid_bundle_t * droid_create(ray_any_t * ray, const char * in_apk, const char *out_dir) {
@@ -114,6 +105,36 @@ char * droid_get_package_name(const droid_bundle_t *bundle) {
     return bundle->context->ray_data.package_name;
 }
 
+static void fs_get_parent_path_only(char *output, const char * path) {
+    if (strrchr(path, '/')) {
+        const char * parent = strrchr(path, '/');
+        const char *end=parent;
+        while (*--parent && *(parent-1)!='/' && parent!=path) {}
+        strncpy(output, parent, end-parent);
+    } else {
+        strcpy(output, path);
+    }
+}
+
+static int locate_cachedir_with(const droid_bundle_t *bundle, const char * pkg_name) {
+    char *paths[] = { (char*)".", nullptr };
+    FTS * fsdir = fts_open(paths, FTS_LOGICAL|FTS_NOCHDIR, nullptr);
+    char * package_name=bundle->context->ray_data.package_name;
+    if (fsdir) {
+        for (const FTSENT *e_file=nullptr; strlen(package_name)==0 && ((e_file=fts_read(fsdir))); ) {
+            if (e_file->fts_info & FTS_F) {
+                if (strcmp(e_file->fts_name, "base.apk")==0) {
+                    if (strstr(e_file->fts_path, pkg_name)==nullptr)
+                        continue;
+                    fs_get_parent_path_only(package_name, e_file->fts_path);
+                }
+            }
+        }
+        fts_close(fsdir);
+    }
+    return strlen(package_name)>0;
+}
+
 void droid_get_apk(droid_bundle_t * bundle, const char * pkg_ref_name) {
     char * apk_list= droid_adb_get_packages_list();
     char * apk_path=apk_list?droid_adb_get_apk_path(apk_list, pkg_ref_name):nullptr;
@@ -124,6 +145,8 @@ void droid_get_apk(droid_bundle_t * bundle, const char * pkg_ref_name) {
             free(apk_path);
             bundle->proceed=true;
         } else {
+            if (!locate_cachedir_with(bundle, pkg_ref_name))
+                break;
             ray_file_load(bundle->context);
             if (access(droid_get_package_name(bundle), F_OK))
                 break;

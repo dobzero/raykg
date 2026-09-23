@@ -14,6 +14,8 @@ typedef struct droid_bundle {
 
     manifest_t * manifest;
 
+    char * lib_files;
+
     bool proceed;
 } droid_bundle_t;
 droid_bundle_t * droid_create(ray_any_t * ray, const char * in_apk, const char *out_dir);

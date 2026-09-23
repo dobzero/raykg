@@ -23,5 +23,7 @@ typedef struct unix_elf_bin {
 
 
 unix_elf_bin_t * unix_elf_open(const char * path);
-void unix_elf_print(const unix_elf_bin_t *ueb);
-void unix_elf_close(unix_elf_bin_t *ueb);
+unix_elf_bin_t * unix_elf_open_fp(FILE *fp);
+
+void unix_elf_print(const unix_elf_bin_t *elf);
+void unix_elf_close(unix_elf_bin_t *elf);

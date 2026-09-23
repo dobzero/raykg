@@ -4,8 +4,8 @@ project(raykg C)
 set(CMAKE_C_STANDARD 23)
 
 file(GLOB CORE_SRC src/core/*.c src/auto/*.c src/core/*.h src/auto/*.h)
-file(GLOB DROID_SRC src/droid/*.c src/droid/adb/*.c src/droid/*.h src/droid/adb/*.h src/droid/meta_inf/*.c src/droid/meta_inf/*.h)
-file(GLOB UNIX_SRC src/unix/elf/*.c drc/unix/elf/*.h)
+file(GLOB DROID_SRC src/droid/*.c src/droid/adb/*.c src/droid/*.h src/droid/adb/*.h src/droid/meta_inf/*.c src/droid/meta_inf/*.h src/droid/tree/*.c src/droid/tree/*.h)
+file(GLOB UNIX_SRC src/unix/elf/*.c src/unix/elf/*.h)
 
 add_library(droid STATIC ${DROID_SRC})
 add_library(unix_elf STATIC ${UNIX_SRC})
