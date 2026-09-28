@@ -3,6 +3,7 @@
 #include "unix/elf/elf.h"
 #include "files.h"
 
+#include <stdlib.h>
 #include <string.h>
 static void droid_dump_all_libs(zip_t *zp, const zip_uint64_t index) {
     zip_file_t *zf = zip_fopen_index(zp, index, 0);

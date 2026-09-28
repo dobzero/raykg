@@ -1,0 +1,12 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="CppCStyleCast" enabled="true" level="WEAK WARNING" enabled_by_default="true" />
+    <inspection_tool class="CppDFALoopConditionNotUpdated" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="CppIntegralToPointerConversion" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="CppNodiscardFunctionWithoutReturnValue" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="CppRedundantEmptyStatement" enabled="true" level="HINT" enabled_by_default="true" />
+    <inspection_tool class="CppSyntaxWarning" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="CppWarningDirective" enabled="true" level="WARNING" enabled_by_default="true" />
+  </profile>
+</component>

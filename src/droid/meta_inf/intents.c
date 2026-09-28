@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 #include "../droid.h"
 void droid_list_intents(const droid_bundle_t *bundle, FILE *fp) {
     char ** intents = manifest_get_all_intents(bundle->manifest);
