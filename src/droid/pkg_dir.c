@@ -108,7 +108,7 @@ static list_t * snapshot(const droid_bundle_t * bundle, const char * only) {
 
 static void snapshot_free(list_t *list) {
     while (list) {
-        free (list_remove(&list, list));
+        free (list_erase(&list, list));
     }
 }
 
@@ -146,7 +146,7 @@ void droid_diff(const droid_bundle_t *bundle[2], const bool exclude_eq, const ch
             if (f_d->crc!=l_d->crc) {
 
             } else {
-                list_emplace(&common, list_remove(&last_only, l));
+                list_emplace(&common, list_erase(&last_only, l));
             }
             break;
         }

@@ -57,13 +57,11 @@ typedef struct list {
 list_t * list_create(void *data);
 list_t * list_dup(const list_t *list);
 
-// dynamic updates list pointer
-void * list_remove(list_t **list, list_t *item);
+void * list_erase(list_t **list, list_t *item);
 void list_emplace(list_t **list, void *data);
 
 void list_insert(list_t *list, void *data);
 list_t * list_find(list_t *list, const void *data);
-void * list_erase(list_t *list, list_t *item);
 void list_destroy(list_t *list);
 
 uint64_t list_size(const list_t * list);

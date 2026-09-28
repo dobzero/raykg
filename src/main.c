@@ -120,7 +120,7 @@ void ray_any_done(ray_any_t * ra) {
     if (ra->type==RAY_BUILD_FOR_APK) {
 
         while (ra->droid_bundles) {
-            droid_destroy(list_remove(&ra->droid_bundles, ra->droid_bundles));
+            droid_destroy(list_erase(&ra->droid_bundles, ra->droid_bundles));
         }
     }
     free(ra);
