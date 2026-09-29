@@ -1,3 +1,4 @@
+#include <fnmatch.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
@@ -80,12 +81,19 @@ static list_t * snapshot(const droid_bundle_t * bundle, const char * only) {
 
         if (*only=='\0') {
             for (size_t j=0;j<3&&!snap_file;j++) {
-                if (strstr(filename, interesting[j]))
+                if (fnmatch(interesting[j],filename, 0)==0)
                     snap_file=true;
             }
         } else {
-            if (strstr(filename, only))
-                snap_file=true;
+            char *bak=nullptr;
+            char only_copy[100];
+            strncpy(only_copy, only, 100);
+
+            for (const char *tok=strtok_r(only_copy, "|", &bak); tok && !snap_file;
+                tok = strtok_r(nullptr, "|", &bak)) {
+                if (fnmatch(tok,filename, 0)==0)
+                    snap_file=true;
+            }
         }
         if (!snap_file)
             continue;

@@ -106,7 +106,8 @@ ray_any_t * ray_build_for(const ray_build_types_e type) {
             apk; apk = strtok_r(nullptr, ",;|", &bak)) {
 
             char output_path[100];
-            sprintf(output_path, "%s-out%ld", apk, random()%100);
+            srandom(time(nullptr));
+            sprintf(output_path, "%s-out%ld", apk, random()%1000);
 
             list_emplace(&ra->droid_bundles, droid_create(ra, apk, output_path));
         }
@@ -175,8 +176,8 @@ int main() {
 
     pa_set_default(pa_string("apk_list"), "F-Droid.apk|org.fdroid.fdroid_2000010.apk");
     pa_set_default(pa_bool("diff"), "true");
-    pa_set_default(pa_bool("exclude_equals"), "true");
-    pa_set_default(pa_string("only"), "classes");
+    pa_set_default(pa_bool("exclude_equals"), "false");
+    pa_set_default(pa_string("only"), "classes*.dex|lib/*|assets/*");
 
 
 
