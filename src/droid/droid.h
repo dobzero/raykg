@@ -8,20 +8,21 @@ typedef struct droid_bundle {
     char *output_dir_files;
     char *output_dir;
     char *input_file;
+
+    size_t bundle_count;
+
     zip_t * pkg_file;
-
-    ray_any_t * context;
-
     manifest_t * manifest;
 
     char * lib_files;
 
+    char package_name[100];
     bool proceed;
 } droid_bundle_t;
 
-droid_bundle_t * droid_create(ray_any_t * ra, const char * in_apk, const char *out_dir);
+droid_bundle_t * droid_create(const char * in_apk, const char *out_dir, size_t bundle_i);
 void droid_destroy(droid_bundle_t * bundle);
-char * droid_get_package_name(const droid_bundle_t * bundle);
+const char * droid_get_package_name(droid_bundle_t * bundle);
 
 bool droid_fw_check_filename(const char *file_a);
 void droid_sign_resign_all(const char *apks, const char * keystore, const char * alias, const char *pass_ks, const char * pass_key);

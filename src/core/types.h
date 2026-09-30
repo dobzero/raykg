@@ -1,4 +1,5 @@
 #pragma once
+#include <stddef.h>
 #include <stdint.h>
 
 typedef struct list list_t;
@@ -17,37 +18,30 @@ typedef struct {
     } value;
 } program_arg_t;
 
-
-typedef struct droid_bundle droid_bundle_t;
-
 typedef enum  {
     RAY_BUILD_FOR_APK
 }ray_build_types_e;
 
-typedef struct ray_any_ {
+typedef struct ray_state {
     ray_build_types_e type;
+    uint64_t r_seed;
+    size_t bundle_count;
+    list_t * droid_bundles;
 
     struct {
-        struct {
-            list_t * droid_bundles;
-            droid_bundle_t * tier_bundle;
-        };
 
         union {
-            struct {
-                char package_name[100];
-            };
         } ray_cnt;
     };
-} ray_any_t;
+} ray_state_t;
 
 
-ray_any_t * ray_build_for(ray_build_types_e type);
+ray_state_t * ray_build_for(ray_build_types_e type);
 
-void ray_any_done(ray_any_t * ra);
+void ray_any_done(ray_state_t * rs);
 
-void ray_file_save(const ray_any_t *ra);
-void ray_file_load(ray_any_t *ra);
+void ray_file_save(const ray_state_t *rs);
+void ray_file_load(ray_state_t *rs);
 
 typedef struct list {
     void * data;

@@ -37,7 +37,7 @@ void droid_sign_resign_all(const char *apks, const char * keystore, const char *
         FILE * signer = popen(sign, "r");
         if (!signer)
             return;
-        fclose(signer);
+        pclose(signer);
 
         if (!droid_fw_check_filename(file)) {
             return;
