@@ -21,7 +21,7 @@ add_subdirectory(libzip)
 add_subdirectory(libslop)
 
 enable_testing()
-add_executable(elfbin_test test/elfbin_test.c)
+add_executable(elfbin_test test/elf_print_test.c)
 target_link_libraries(elfbin_test unix_elf)
 add_test(elfbin_test "open bin files for testing prp")
 
